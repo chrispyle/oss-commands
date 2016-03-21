@@ -12,14 +12,14 @@
   <properties>
     <project.name>${project.groupId}.${project.artifactId}</project.name>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <version.oss-java-helpers>0.0.1-SNAPSHOT</version.oss-java-helpers>
+    <version.cc-oss-java-helpers>0.0.1-SNAPSHOT</version.cc-oss-java-helpers>
   </properties>
 
   <dependencies>
     <dependency>
       <groupId>com.clearcapital</groupId>
       <artifactId>oss-java-helpers</artifactId>
-      <version>${version.oss-java-helpers}</version>
+      <version>${version.cc-oss-java-helpers}</version>
     </dependency>
   </dependencies>
 
