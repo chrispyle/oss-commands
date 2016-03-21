@@ -1,4 +1,4 @@
-package com.clearcapital.oss.bundles;
+package com.clearcapital.oss.executors;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -6,6 +6,8 @@ import java.util.Collection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.clearcapital.oss.commands.Command;
+import com.clearcapital.oss.commands.CommandExecutionException;
 import com.clearcapital.oss.java.StackHelpers;
 
 /**
@@ -25,9 +27,9 @@ import com.clearcapital.oss.java.StackHelpers;
  * 
  * @author eehlinger
  */
-public class QueuedBundleExecutor implements BundleExecutor {
+public class QueuedCommandExecutor implements CommandExecutor {
 
-    private static Logger log = LoggerFactory.getLogger(QueuedBundleExecutor.class);
+    private static Logger log = LoggerFactory.getLogger(QueuedCommandExecutor.class);
 
     private final Collection<Command> bundles = new ArrayList<Command>();
 
@@ -35,7 +37,7 @@ public class QueuedBundleExecutor implements BundleExecutor {
      * Create a BundleExecutor
      * 
      */
-    public QueuedBundleExecutor() {
+    public QueuedCommandExecutor() {
     }
 
     /**

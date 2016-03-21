@@ -3,16 +3,16 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.clearcapital</groupId>
-  <artifactId>oss-bundles</artifactId>
-  <name>oss-bundles</name>
-  <description>Bundles Library</description>
+  <artifactId>oss-commands</artifactId>
+  <name>oss-commands</name>
+  <description>Commands Library</description>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <properties>
     <project.name>${project.groupId}.${project.artifactId}</project.name>
-    <version.oss-java-helpers>0.0.1-SNAPSHOT</version.oss-java-helpers>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <version.oss-java-helpers>0.0.1-SNAPSHOT</version.oss-java-helpers>
   </properties>
 
   <dependencies>

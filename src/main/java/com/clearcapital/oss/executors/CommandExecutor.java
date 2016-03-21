@@ -1,12 +1,15 @@
-package com.clearcapital.oss.bundles;
+package com.clearcapital.oss.executors;
+
+import com.clearcapital.oss.commands.Command;
+import com.clearcapital.oss.commands.CommandExecutionException;
 
 /**
- * Interface allowing a bundle execution strategy to be pluggable.
+ * Interface allowing a command execution strategy to be pluggable.
  * 
  * @author eehlinger
  * 
  */
-public interface BundleExecutor extends AutoCloseable {
+public interface CommandExecutor extends AutoCloseable {
 
     /**
      * Add a command to be executed according to the implementing class's execution strategy.

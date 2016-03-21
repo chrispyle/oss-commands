@@ -1,4 +1,7 @@
-package com.clearcapital.oss.bundles;
+package com.clearcapital.oss.executors;
+
+import com.clearcapital.oss.commands.Command;
+import com.clearcapital.oss.commands.CommandExecutionException;
 
 /**
  * <p>
@@ -15,9 +18,9 @@ package com.clearcapital.oss.bundles;
  * </ul>
  * 
  */
-public class ImmediateBundleExecutor implements BundleExecutor {
+public class ImmediateCommandExecutor implements CommandExecutor {
 
-    private static final BundleExecutor instance = new ImmediateBundleExecutor();
+    private static final CommandExecutor instance = new ImmediateCommandExecutor();
 
     @Override
     public void close() throws CommandExecutionException {
@@ -36,7 +39,7 @@ public class ImmediateBundleExecutor implements BundleExecutor {
         // no-op
     }
 
-    public static BundleExecutor getInstance() {
+    public static CommandExecutor getInstance() {
         return instance;
     }
 

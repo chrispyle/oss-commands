@@ -1,12 +1,12 @@
 ![Logo](https://www.clearcapital.com/wp-content/uploads/2015/02/Clear-Capital@2x.png)
-# Bundles
+# Commands
 
 ## What is it?
 
-The Bundles library helps you to implement *near*-transactional
+The Commands library helps you to implement *near*-transactional
 behavior on top of database(s) which do not provide transactions.
 
-A Bundle is a collection of implementations of the Command pattern,
+An Executor is a collection of implementations of the Command pattern,
 intended for use with Java's
 [try-with-resources](https://docs.oracle.com/javase/tutorial/essential/exceptions/tryResourceClose.html)
 feature to assist in writing *near*-transactional code. The idea is
@@ -14,10 +14,10 @@ that, by separating the *calculation* and *execution* of
 non-transactional mutations, we can delay the *executions* until such
 time as we can provide a reasonable guarantee that we will submit all
 of them without exceptions causing issues.  The pattern for using
-Bundles looks something like this:
+Commands looks something like this:
 
 ```java
-try (BundleExecutor executor = new QueuedBundleExecutor()) {
+try (CommandExecutor executor = new QueuedCommandExecutor()) {
      // a series of calls generating a bunch of Commands.
      executor.execute();
 }
@@ -26,7 +26,7 @@ try (BundleExecutor executor = new QueuedBundleExecutor()) {
 Note that you must explicitly call executor.execute(), or else the
 executor will **IGNORE** all of the generated ```Commands```, and the
 changes represented by those ```Commands``` will not
-occur. ```QueuedBundleExecutor``` tracks whether execute() has
+occur. ```QueuedCommandExecutor``` tracks whether execute() has
 been called, and logs warnings if you call close() without calling
 execute() first.
 
@@ -38,7 +38,7 @@ of the writes to occur, because that could leave the data in an
 inconsistent state:
 
 ```java
-try (BundleExecutor executor = new QueuedBundleExecutor()) {
+try (CommandExecutor executor = new QueuedCommandExecutor()) {
      executor.addBundle(generateCommand('A'));
      throw new Exception();
      executor.addBundle(generateCommand('B'));
@@ -52,14 +52,14 @@ will happen here is that Command 'A' will be added to "executor," then
 the exception will be thrown, bypassing the generation of Command 'B'
 and the call to ```executor.execute()```. ```executor.close()``` will
 then be called by the try-with-resources block, and
-```DelgatingBundleExecutor``` will write a warning to the log that it
-is ignoring Command "A." The Bundles library attempts to make this log
+```DelgatingCommandExecutor``` will write a warning to the log that it
+is ignoring Command "A." The Commands library attempts to make this log
 message as useful as possible, including, for example, the method
 locations where the ```Commands``` were generated.
 
 ## Why might I need it?
 
-Here are a few scenarios under which you might consider using Bundles:
+Here are a few scenarios under which you might consider using Commands:
 
 - You need to write a bunch of data to a Cassanra database. Cassandra
   does not provide transactions in the traditional RDBMS sense of being
@@ -104,7 +104,7 @@ also likely acceptable to accept *some* risk of inconsistency, but not
 
 ## What's Provided
 
-There isn't really much provided by the Bundles library; it's more about
+There isn't really much provided by the Commands library; it's more about
 supporting the *paradigm* of decoupling the generation of command generation
 from the execution of those commands.  The entire library consists of
 only *five* java modules (excluding tests):
@@ -121,25 +121,25 @@ only *five* java modules (excluding tests):
 - ```BundleExecutionException``` - this is the only type of exception which
   is allowed from ```Command.execute()```
 
-- BundleExecutor - this is an ```interface``` which allows you to
+- CommandExecutor - this is an ```interface``` which allows you to
   choose a policy for *when* to execute ```Commands```s. Two
   implementations are provided, though you will generally want to use
-  ```QueuedBundleExecutor``` outside of unit tests.
+  ```QueuedCommandExecutor``` outside of unit tests.
 
-- ```QueuedBundleExecutor``` - This implementation of
-  ```BundleExecutor``` is really the heart and soul of this
+- ```QueuedCommandExecutor``` - This implementation of
+  ```CommandExecutor``` is really the heart and soul of this
   library. This ```class``` supports the delay of execution which
   brings value.
 
-- ```ImmediateBundleExecutor``` - This is useful for writing unit
-  tests for the layers of code which need a ```BundleExecutor``` to
+- ```ImmediateCommandExecutor``` - This is useful for writing unit
+  tests for the layers of code which need a ```CommandExecutor``` to
   operate. This might include data access layers, for example.
 
 ## Notes
 
 - Assuming your software is layered so that you have a data-access
   layer near the "bottom" of your stack, talking to the database, and
-  that you are using ```Bundles``` to assist in providing consistency,
+  that you are using ```Commands``` to assist in providing consistency,
   it is generally very bad form to create an executor at the DAO or
   Table layers, because it is rare that data access layers can
   understand the full context of their actions and the rules around
@@ -154,7 +154,7 @@ only *five* java modules (excluding tests):
   exception during the mixed calculation and write phase could result
   in some writes being submitted to database drivers, it is not a
   panacea. For example, it is possible for an exception to occur just
-  during the ```BundleExecutor.execute()``` method. This approach
+  during the ```CommandExecutor.execute()``` method. This approach
   reduces the window for inconsistent writes to a few likely causes:
  
   - a query is improperly generated, resulting in a bad-request type
@@ -162,10 +162,10 @@ only *five* java modules (excluding tests):
     ensuring that all queries have proper unit tests.
   
   - a database server goes offline in the middle of
-    ```BundleExecutor.execute()```.
+    ```CommandExecutor.execute()```.
 
-  - the entire Java container holding the ```BundleExecutor``` crashes
-    in the middle of a call to ```BundleExecutor.execute()```, perhaps
+  - the entire Java container holding the ```CommandExecutor``` crashes
+    in the middle of a call to ```CommandExecutor.execute()```, perhaps
     due to a poorly-timed out of memory condition.
   
 ## Room for improvement / Future plans:
@@ -173,7 +173,7 @@ only *five* java modules (excluding tests):
 - It is conceivable that we could provide more safety by updating the
   ```Command``` interface so that it has an ```undo()``` method, which
   we would call if any of the ```Command.execute()``` calls from
-  ```QueuedBundleExecutor``` throw an exception. Of course, with this
+  ```QueuedCommandExecutor``` throw an exception. Of course, with this
   sort of behavior, you could still get transient inconsistency, and
   there are still issues like, "well, what happens if the undo() method
   throws?"
@@ -186,11 +186,11 @@ only *five* java modules (excluding tests):
   simpler than adding ```undo()```, because it would mean that failed
   ```execute()```s would be retried, rather than attempting to roll
   back the writes from the same ```Command``` list. This would involve
-  writing something like a ```MessageQueueBundleExecutor```. It may be
+  writing something like a ```MessageQueueCommandExecutor```. It may be
   worthwhile to keep such a thing in a separate library, or a set of
   other libraries, which integrate this package with varying message
   queue systems.
 
 ## Related Packages
 
-- 
+- *oss-cassandra-helpers* [//] # (../oss-cassandra-helpers/README.md)
