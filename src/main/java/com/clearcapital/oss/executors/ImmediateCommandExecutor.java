@@ -5,7 +5,7 @@ import com.clearcapital.oss.commands.CommandExecutionException;
 
 /**
  * <p>
- * An implementation of the BundleExecutor interface, which executes commands as soon as they are added.
+ * An implementation of the {@link CommandExecutor}interface, which executes commands as soon as they are added.
  * </p>
  * 
  * <p>
