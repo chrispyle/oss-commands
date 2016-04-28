@@ -12,14 +12,14 @@ import com.clearcapital.oss.java.StackHelpers;
 
 /**
  * This class works in conjunction with {@link Command} to separate generation of Commands from their execution.
- * Mutations, for example, would include submission of write statements to a database driver. A BundleExecutor
- * represents a growing collection of Bundles, which are executed once the entire set of mutations has been built.
+ * Mutations, for example, would include submission of write statements to a database driver. A {@link QueuedCommandExecutor}
+ * represents a growing collection of Commands, which are executed once the entire set of mutations has been built.
  * 
  * Since this class implements AutoCloseable, it expects to be used in a try-with-resources block. A typical example
  * might look like:
  * 
  * <pre>
- * try (BundleExecutor executor = new BundleExecutor()) {
+ * try (CommandExecutor executor = new QueuedCommandExecutor()) {
  *     // a series of calls generating a bunch of Bundles.
  *     executor.execute();
  * }
